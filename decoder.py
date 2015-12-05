@@ -165,6 +165,13 @@ def make_mouse_move(from_sq, to_sq, orient=True):
     pyautogui.dragTo(x, y, duration=0.1 + np.random.random_sample())
 
 
+def grab_board(x=x, y=y, w=w, h=h):
+    # print "Grabbing board image at (%d, %d) x (%d, %d) ..." % (x, y, x + w, y + h),
+    im = grab(bbox=(x, y, x + w, y + h), backend='scrot')
+    im.save('.screenshot.png')
+    return plt.imread('.screenshot.png')
+
+
 def cache_squares(im, dest="pieces"):
     # Given board image, save squares to pieces directory in row/col order
     print "Caching squares from image to %s..." % (dest),
@@ -177,33 +184,6 @@ def cache_squares(im, dest="pieces"):
             piecename = join(dest, str(r) + str(c) + ".png")
             imsave(piecename, piece)
     print "Success."
-
-
-def grab_board(x=x, y=y, w=w, h=h):
-    # print "Grabbing board image at (%d, %d) x (%d, %d) ..." % (x, y, x + w, y + h),
-    im = grab(bbox=(x, y, x + w, y + h), backend='scrot')
-    im.save('img.png')
-    # print "Success."
-    return plt.imread('img.png')
-
-
-def reset_squares():
-    pyautogui.click(1645, 389, duration=0.2)
-
-
-def fen2file(fen, dest):
-    with open(join(dest, "fen"), "w") as f:
-        f.write(fen)
-
-
-def create_test_train(which):
-    for i in range(1):
-        fen = play_stockfish(np.random.randint(40))
-        dest = join(which, "%0.2d" % (i))
-        im = grab_board()
-        cache_squares(im, dest=dest)
-        fen2file(fen, dest)
-        # plt.imshow(im)
 
 
 def play_stockfish(board):
