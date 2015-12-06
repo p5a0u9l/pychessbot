@@ -17,10 +17,14 @@ h = 408
 sq = w/8
 
 board_lu = {}
-board_lu[True] = np.array([[(x + sq*r + sq/2, y + w - sq*c - sq/2) for r in range(8)]
-                           for c in range(8)]).ravel().reshape((64, 2))
-board_lu[False] = np.array([[(x + w - sq*r - sq/2, y + sq*c + sq/2) for r in range(8)]
-                            for c in range(8)]).ravel().reshape((64, 2))
+board_lu[True] = np.array(
+    [[(x + sq * r + sq / 2, y + w - sq * c - sq / 2) for r in range(8)]
+     for c in range(8)]).ravel().reshape(
+    (64, 2))
+board_lu[False] = np.array(
+    [[(x + w - sq * r - sq / 2, y + sq * c + sq / 2) for r in range(8)]
+     for c in range(8)]).ravel().reshape(
+    (64, 2))
 
 
 class ChessBoardDecoder():
@@ -41,6 +45,7 @@ class ChessBoardDecoder():
 
     def test(self, x, true_symbol):
         rect_piece = self.predict_piece(x)
+
         # print "True: %s, Predict: %s" % (true_symbol, rect_piece.symbol())
         return (true_symbol == rect_piece.symbol())*1
 
@@ -89,7 +94,8 @@ class ChessBoardDecoder():
             for j, im in enumerate(ic):
                 code = [int(x) for x in ic.files[j][6:9]]
                 piece_code = code[1] + 6*code[0]
-                # print "Im: %s, Piece: %s" % (ic.files[j], chess.PIECE_SYMBOLS[code[1]])
+                # print "Im: %s, Piece: %s" % (ic.files[j],
+                # chess.PIECE_SYMBOLS[code[1]])
                 labels.append(piece_code)
                 data.append(np.array(im))
 
@@ -166,7 +172,8 @@ def make_mouse_move(from_sq, to_sq, orient=True):
 
 
 def grab_board(x=x, y=y, w=w, h=h):
-    # print "Grabbing board image at (%d, %d) x (%d, %d) ..." % (x, y, x + w, y + h),
+    # print "Grabbing board image at (%d, %d) x (%d, %d) ..." % (x, y, x + w,
+    # y + h),
     im = grab(bbox=(x, y, x + w, y + h), backend='scrot')
     im.save('.screenshot.png')
     return plt.imread('.screenshot.png')
@@ -196,6 +203,12 @@ def play_stockfish(board):
     make_mouse_move(m[0].from_square, m[0].to_square)
     board.push_uci(m[0].uci())
     print board
+
+
+def is_my_turn(cbd):
+    cbd.decode_board()
+    cbd.whose_turn()
+    return cbd.turn == bot_color
 
 
 def check_align(x, y, w, h):
