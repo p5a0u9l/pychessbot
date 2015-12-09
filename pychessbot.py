@@ -3,6 +3,7 @@ import numpy as np
 from time import sleep
 import sys
 bot_color = [False, True][int(sys.argv[1])]
+from decoder import is_my_turn
 from decoder import ChessBoardDecoder, ChessEngineIface, make_mouse_move
 
 
@@ -29,12 +30,6 @@ def initialize_decoder():
     else:
         print "Testing passed, game on!"
         return cbd
-
-
-def is_my_turn(cbd):
-    cbd.decode_board()
-    cbd.whose_turn()
-    return cbd.turn == bot_color
 
 
 def main():
