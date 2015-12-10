@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+__file__ = "pychessbot.py"
+__author__ = "Paul Adams"
 import numpy as np
 from time import sleep
 import sys
-bot_color = [False, True][int(sys.argv[1])]
 from decoder import is_my_turn
 from decoder import ChessBoardDecoder, ChessEngineIface, make_mouse_move
+bot_color = [False, True][int(sys.argv[1])]
 
 
 def make_a_move(cbd, fish):
@@ -17,6 +19,7 @@ def make_a_move(cbd, fish):
     move = fish.get_best_move(cbd.board)[0]
     make_mouse_move(move.from_square, move.to_square, orient=bot_color)
     cbd.decode_board()  # force update of last board
+    cbd.print_flag = True
     cbd.turn = ~bot_color   # ensure not bot's turn
 
 
@@ -36,7 +39,7 @@ def main():
     cbd = initialize_decoder()
     fish = ChessEngineIface()
     while 1:
-        if cbd.last_board is None or is_my_turn(cbd):
+        if cbd.last_board is None or is_my_turn(cbd, bot_color):
             make_a_move(cbd, fish)
         else:
             sleep(1.0)

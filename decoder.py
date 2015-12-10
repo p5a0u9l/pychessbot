@@ -1,3 +1,6 @@
+__file__ = "decoder.py"
+__author__ = "Paul Adams"
+
 from sklearn import svm
 import matplotlib.pyplot as plt
 from skimage.transform import resize
@@ -8,23 +11,23 @@ import chess
 from chess import uci
 import numpy as np
 import os
+import sys
 from os.path import join
 # global board dimensions
-x = 1027
-y = 188
-w = 408
-h = 408
+# 1036, 163, 304, 30
+x = 1036
+y = 163
+w = 304
+h = 304
 sq = w/8
 
 board_lu = {}
 board_lu[True] = np.array(
     [[(x + sq * r + sq / 2, y + w - sq * c - sq / 2) for r in range(8)]
-     for c in range(8)]).ravel().reshape(
-    (64, 2))
+     for c in range(8)]).ravel().reshape((64, 2))
 board_lu[False] = np.array(
     [[(x + w - sq * r - sq / 2, y + sq * c + sq / 2) for r in range(8)]
-     for c in range(8)]).ravel().reshape(
-    (64, 2))
+     for c in range(8)]).ravel().reshape((64, 2))
 
 
 class ChessBoardDecoder():
@@ -42,10 +45,10 @@ class ChessBoardDecoder():
         self.last_board = None
         self.turn = color
         self.board = chess.Board()
+        self.print_flag = True
 
     def test(self, x, true_symbol):
         rect_piece = self.predict_piece(x)
-
         # print "True: %s, Predict: %s" % (true_symbol, rect_piece.symbol())
         return (true_symbol == rect_piece.symbol())*1
 
@@ -71,11 +74,19 @@ class ChessBoardDecoder():
     def whose_turn(self):
         if self.board != self.last_board:
             self.turn = ~self.turn
-        #        Turn   Turn
-        # Color   0,0 | 0, 1   Me, Opp ==> xnor
-        # Color   1,0 | 1, 1   Opp, Me
-        print "%s (%s) to move ..." % (["Black", "White"][self.turn],
-                                       ["Opponent", "Me"][not self.turn ^ self.color])
+
+        if self.print_flag:
+            #        Turn   Turn
+            # Color   0,0 | 0, 1   Me, Opp ==> xnor
+            # Color   1,0 | 1, 1   Opp, Me
+            print "\n%s (%s) to move ..." % \
+                (["Black", "White"][self.turn],
+                 ["Opponent", "Me"][not self.turn ^ self.color]),
+            self.print_flag = False
+            sys.stdout.flush()
+        else:
+            sys.stdout.write('.')
+            sys.stdout.flush()
 
     def predict_piece(self, x):
         y = self.clf.predict(x)[0]
@@ -114,7 +125,6 @@ class ChessBoardDecoder():
 
     def im2feature(self, im):
         im = resize(im, (self.SCALE, self.SCALE))
-        # import ipdb; ipdb.set_trace()
         im = im.reshape((-1, 3))
         im = np.mean(im, axis=1)
         return im
@@ -126,7 +136,6 @@ class ChessBoardDecoder():
     def score_against_test_images(self):
         print "Scoring Classifier accuracy...",
         correct = []
-        lu = {0: False, 1: True}
         for i in range(self.n_dir):
             root = "train/"
             ic = ImageCollection(root + "*.png", load_func=self.im_loader)
@@ -175,8 +184,8 @@ def grab_board(x=x, y=y, w=w, h=h):
     # print "Grabbing board image at (%d, %d) x (%d, %d) ..." % (x, y, x + w,
     # y + h),
     im = grab(bbox=(x, y, x + w, y + h), backend='scrot')
-    im.save('.screenshot.png')
-    return plt.imread('.screenshot.png')
+    im.save('screenshot.png')
+    return plt.imread('screenshot.png')
 
 
 def cache_squares(im, dest="pieces"):
@@ -205,13 +214,14 @@ def play_stockfish(board):
     print board
 
 
-def is_my_turn(cbd):
+def is_my_turn(cbd, bot_color):
     cbd.decode_board()
     cbd.whose_turn()
     return cbd.turn == bot_color
 
 
 def check_align(x, y, w, h):
+    sq = w/8
     im = grab_board(x=x, y=y, w=w, h=h)
     plt.imshow(im)
     plt.show()

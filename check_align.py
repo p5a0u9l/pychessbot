@@ -12,11 +12,10 @@ import cv2
 
 
 # x = 900
-x = 1
-y = 1
-w = 1980
-h = 1080
-# h = 426
+x = 1027
+y = 188
+w = 408
+h = 408
 sq = w/8
 # board lu list contains  =  x, y for each row, col address on the board
 board_lu = [[(x + sq*r + sq/2, y + w - sq*c - sq/2) for r in range(8)]
@@ -66,62 +65,64 @@ def get_most_common_square(squares):
     return area, np.argmax(count)
 
 im = grab_board()  # get image
-squares = find_squares(img_as_ubyte(im))
-area, square = get_most_common_square(squares)
-# import ipdb; ipdb.set_trace()
+plt.imshow(im)
+plt.show
+# squares = find_squares(img_as_ubyte(im))
+# area, square = get_most_common_square(squares)
+# # import ipdb; ipdb.set_trace()
 
-im_sq = np.zeros(im.shape, np.uint8)
-for sq in squares:
-    for s in sq:
-        im_sq[s[1], s[0], :] = 255
-
-
-w, h, d = im.shape  # image dims
-gray = rgb2gray(im)  # convert to gray scale
-selem = disk(100)
-im_bin = gray >= rank.threshold(gray, selem)  # global otsu binarize
-edges = canny(im_bin, sigma=.1)  # get edges from binary image
-corns = corner_harris(edges, sigma=.2)  # get corners
-corns = corner_peaks(corns)
-x = np.zeros(im.shape)
-x[:, :, 0] += 255*edges
-x[corns[:, 0] + 2, corns[:, 1] + 2, :] = 255
-# for c in corns:
-
-#     dist = np.abs(c - corns)
-x = np.uint8(x)
+# im_sq = np.zeros(im.shape, np.uint8)
+# for sq in squares:
+#     for s in sq:
+#         im_sq[s[1], s[0], :] = 255
 
 
-# global otsu
-plt.figure(figsize=(12, 12))
-plt.subplot(2, 2, 1)
-plt.imshow(im_bin, cmap="gray")
-plt.title("Global Otsu binarization")
+# w, h, d = im.shape  # image dims
+# gray = rgb2gray(im)  # convert to gray scale
+# selem = disk(100)
+# im_bin = gray >= rank.threshold(gray, selem)  # global otsu binarize
+# edges = canny(im_bin, sigma=.1)  # get edges from binary image
+# corns = corner_harris(edges, sigma=.2)  # get corners
+# corns = corner_peaks(corns)
+# x = np.zeros(im.shape)
+# x[:, :, 0] += 255*edges
+# x[corns[:, 0] + 2, corns[:, 1] + 2, :] = 255
+# # for c in corns:
 
-# Morph
-plt.subplot(2, 2, 2)
-plt.imshow(x)
-plt.title("Eroded")
+# #     dist = np.abs(c - corns)
+# x = np.uint8(x)
 
 
-# Edge detection
-plt.subplot(2, 2, 3)
-plt.imshow(edges, cmap="gray")
-plt.title("Edges of global bin")
+# # global otsu
+# plt.figure(figsize=(12, 12))
+# plt.subplot(2, 2, 1)
+# plt.imshow(im_bin, cmap="gray")
+# plt.title("Global Otsu binarization")
 
-# Corner detection
-plt.subplot(2, 2, 4)
-# plt.scatter(corns[:, 1], corns[:, 0], marker='.')
-# plt.xlim((0, w-1))
-# plt.ylim((0, h-1))
-# plt.gca().invert_yaxis()
-# plt.title("Foerstner Corner Detection on Global bin")
-plt.imshow(im_sq)
-plt.tight_layout()
-plt.show()
+# # Morph
+# plt.subplot(2, 2, 2)
+# plt.imshow(x)
+# plt.title("Eroded")
 
-imsave("bin.png", img_as_ubyte(im_bin))
-imsave("sq.png", img_as_ubyte(im_sq))
-imsave("edges.png", img_as_ubyte(edges))
-imsave("x.png", x)
-# imsave("corners.png", corns)
+
+# # Edge detection
+# plt.subplot(2, 2, 3)
+# plt.imshow(edges, cmap="gray")
+# plt.title("Edges of global bin")
+
+# # Corner detection
+# plt.subplot(2, 2, 4)
+# # plt.scatter(corns[:, 1], corns[:, 0], marker='.')
+# # plt.xlim((0, w-1))
+# # plt.ylim((0, h-1))
+# # plt.gca().invert_yaxis()
+# # plt.title("Foerstner Corner Detection on Global bin")
+# plt.imshow(im_sq)
+# plt.tight_layout()
+# plt.show()
+
+# imsave("bin.png", img_as_ubyte(im_bin))
+# imsave("sq.png", img_as_ubyte(im_sq))
+# imsave("edges.png", img_as_ubyte(edges))
+# imsave("x.png", x)
+# # imsave("corners.png", corns)
