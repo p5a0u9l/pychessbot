@@ -1,2 +1,3 @@
-actually
-![README](report/PyChessBot.pdf)
+### actually
+
+[README](report/PyChessBot.pdf)
